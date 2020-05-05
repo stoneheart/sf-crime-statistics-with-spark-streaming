@@ -1,2 +1,2 @@
-# sf-crime-statistics-with-spark-streaming
+# SF Crime Statistics with Spark Streaming
  Udacity Data Streaming Nanodegree Project 2
