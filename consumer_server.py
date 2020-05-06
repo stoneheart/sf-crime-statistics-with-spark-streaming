@@ -14,11 +14,13 @@ class KafkaConsumer:
         topic_name,
         group_id,
         offset_earliest=False,
-        consume_timeout=1.0
+        consume_timeout=1.0,
+        sleep_secs=0.5
     ):
         self.topic_name = topic_name
         self.offset_earliest = offset_earliest
         self.consume_timeout = consume_timeout
+        self.sleep_secs = sleep_secs
 
         # create consumer with assigned properties
         self.broker_properties = {
@@ -55,15 +57,18 @@ class KafkaConsumer:
         logger.info('closing consumer')
         self.consumer.close()
 
-def run():
+    def run(self):
+        try:
+            while True:
+                self.consume()
+                time.sleep(self.sleep_secs)
+        except KeyboardInterrupt as e:
+            logger.info('shutting down consumer')
+            self.close()
+
+def main():
     consumer = KafkaConsumer('police.department.calls', 'test-consumer')
-    try:
-        while True:
-            consumer.consume()
-            time.sleep(1)
-    except KeyboardInterrupt as e:
-        logger.info('shutting down consumer')
-        consumer.close()
+    consumer.run()
 
 if __name__ == '__main__':
-    run()
+    main()
