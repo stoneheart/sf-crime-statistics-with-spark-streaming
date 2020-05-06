@@ -7,6 +7,20 @@ import pyspark.sql.functions as psf
 
 # TODO Create a schema for incoming resources
 schema = StructType([
+    StructField("crime_id", StringType(), True),
+    StructField("original_crime_type_name", StringType(), True),
+    StructField("reprot_date", TimestampType(), True),
+    StructField("call_date", TimestampType(), True),
+    StructField("offense_date", TimestampType(), True),
+    StructField("call_time", StringType(), True),
+    StructField("call_date_time", TimestampType(), True),
+    StructField("disposition", StringType(), True),
+    StructField("address", StringType(), True),
+    StructField("city", StringType(), True),
+    StructField("state", StringType(), True),
+    StructField("agency_id", StringType(), True),
+    StructField("address_type", StringType(), True),
+    StructField("common_location", StringType(), True)
 ])
 
 def run_spark_job(spark):
