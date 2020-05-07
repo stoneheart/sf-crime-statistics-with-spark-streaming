@@ -40,11 +40,13 @@ def run_spark_job(spark):
 
     # TODO extract the correct column from the kafka input resources
     # Take only value and convert it to String
-#    kafka_df = df.selectExpr("")
-#
-#    service_table = kafka_df\
-#        .select(psf.from_json(psf.col('value'), schema).alias("DF"))\
-#        .select("DF.*")
+    kafka_df = df.selectExpr("CAST(value AS STRING)")
+
+    service_table = kafka_df \
+        .select(psf.from_json(psf.col('value'), schema).alias("DF")) \
+        .select("DF.*")
+
+    service_table.printSchema()
 #
 #    # TODO select original_crime_type_name and disposition
 #    distinct_table = 
