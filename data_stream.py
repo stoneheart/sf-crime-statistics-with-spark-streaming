@@ -33,6 +33,7 @@ def run_spark_job(spark):
         .format("kafka") \
         .option("kafka.bootstrap.servers", "localhost:9092") \
         .option("subscribe", "police.department.calls") \
+        .option("startingOffsets", "earliest") \
         .load()
 
     # Show schema for the incoming resources for checks
@@ -47,20 +48,31 @@ def run_spark_job(spark):
         .select("DF.*")
 
     service_table.printSchema()
-#
-#    # TODO select original_crime_type_name and disposition
-#    distinct_table = 
-#
-#    # count the number of original crime type
-#    agg_df = 
-#
-#    # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
-#    # TODO write output stream
-#    query = agg_df \
-#
-#
-#    # TODO attach a ProgressReporter
-#    query.awaitTermination()
+
+    # TODO select original_crime_type_name and disposition
+    distinct_table = service_table \
+        .select("original_crime_type_name", "disposition", "call_date_time")
+
+    # count the number of original crime type
+    agg_df = distinct_table \
+        .withWatermark("call_date_time", "10 minutes") \
+        .groupBy(
+            psf.window(distinct_table.call_date_time, "60 minutes", "60 minutes"),
+            distinct_table.original_crime_type_name) \
+        .count() \
+        .orderBy("window")
+
+    # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
+    # TODO write output stream
+    query = agg_df \
+        .writeStream \
+        .outputMode("complete") \
+        .format("console") \
+        .trigger(processingTime="30 seconds") \
+        .start()
+
+    # TODO attach a ProgressReporter
+    query.awaitTermination()
 #
 #    # TODO get the right radio code json path
 #    radio_code_json_filepath = ""
@@ -88,6 +100,8 @@ if __name__ == "__main__":
         .master("local[*]") \
         .appName("KafkaSparkStructuredStreaming") \
         .getOrCreate()
+
+    spark.conf.set("spark.sql.shuffle.partitions", 2)
 
     logger.info("Spark started")
 
