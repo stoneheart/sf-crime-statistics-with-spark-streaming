@@ -53,7 +53,8 @@ def run_spark_job(spark):
 
     # TODO select original_crime_type_name and disposition
     distinct_table = service_table \
-        .select("original_crime_type_name", "disposition", "call_date_time")
+        .select("original_crime_type_name", "disposition", "call_date_time") \
+        .distinct()
 
     distinct_table.printSchema()
 
