@@ -67,7 +67,7 @@ class KafkaConsumer:
             self.close()
 
 def main():
-    consumer = KafkaConsumer('police.department.calls', 'test-consumer')
+    consumer = KafkaConsumer('police.department.calls', 'test-consumer', True)
     consumer.run()
 
 if __name__ == '__main__':
